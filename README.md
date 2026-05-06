@@ -12,6 +12,7 @@
 | `checkcuda.py`      | 检查 CuPy、CUDA Runtime、CUDA Driver 和 GPU 设备信息              |
 | `check_yolo.py`     | 检查 Ultralytics YOLO、PyTorch、CUDA、OpenCV 等环境信息           |
 | `check_piles.py`    | 扫描指定目录，统计文件夹大小、压缩包大小，并输出占用空间 Top 30   |
+| `testcore.py`       | 多核 CPU 浮点性能测试，使用 NumPy 矩阵乘法计算 GFLOPS             |
 | `moveosz.py`        | 递归查找并移动 `.osz` 文件到目标目录，自动避免同名覆盖            |
 | `split_pic.py`      | 将图片和 YOLO 标签按比例划分为训练集 / 验证集，并生成 `data.yaml` |
 
@@ -40,6 +41,7 @@ random
 部分脚本需要额外安装依赖：
 
 ```bash
+pip install numpy
 pip install pyyaml
 pip install torch
 pip install ultralytics
@@ -150,7 +152,35 @@ python check_piles.py
 
 ---
 
-### 5. 批量移动 `.osz` 文件
+### 5. 多核 CPU 浮点性能测试
+
+```bash
+python testcore.py
+```
+
+功能：
+
+- 自动检测 CPU 核心数，为每个核心启动一个进程
+- 每个进程循环执行 2000×2000 双精度矩阵乘法
+- 每 2 秒汇总报告总算力（GFLOPS）和每核心平均算力
+- 按 `Ctrl+C` 停止测试
+
+示例输出：
+
+```text
+系统检测到 16 个核心，开始性能测试...
+时间(s)      | 总算力 (GFLOPS)       | 每核心平均 (GFLOPS)
+------------------------------------------------------------
+2           | 420.50               | 26.28
+4           | 438.12               | 27.38
+6           | 431.67               | 26.98
+```
+
+适用于对比不同机器的 CPU 浮点性能，或验证散热 / 功耗墙下的持续算力。
+
+---
+
+### 6. 批量移动 `.osz` 文件
 
 玩osu导致的
 
@@ -183,7 +213,7 @@ python moveosz.py
 
 ---
 
-### 6. 划分 YOLO 数据集并生成 `data.yaml`
+### 7. 划分 YOLO 数据集并生成 `data.yaml`
 
 `split_pic.py` 用于将按类别存放的图片和标签划分为 YOLO 训练格式。
 
